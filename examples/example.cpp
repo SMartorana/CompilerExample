@@ -1,32 +1,44 @@
 #include <compiler.hpp>
 
-int main() {
-    // Example usage
-    std::unique_ptr<Module> myModule = std::make_unique<Module>("MyModule");
+// namespace ce::example {
 
-    // Adding functions to the module
-    std::unique_ptr<Function> func1 = std::make_unique<Function>("Function1");
-    std::unique_ptr<BasicBlock> bb1 = std::make_unique<BasicBlock>("BB1");
-    std::unique_ptr<BasicBlock> bb2 = std::make_unique<BasicBlock>("BB2");
-    std::unique_ptr<BasicBlock> bb3 = std::make_unique<BasicBlock>("BB3");
+    int main() {
+        // Example usage
+        std::unique_ptr<Module> myModule = std::make_unique<Module>("MyModule");
 
-    bb1->addSuccessor(std::move(bb2), "true");
-    bb1->addSuccessor(std::move(bb3), "false");
+        // Adding functions to the module
+        std::unique_ptr<Function> func1 = std::make_unique<Function>("Function1");
+        func1->setEntryBlockName("BB1"); // Set entry point before adding basic blocks
+        // Add basic blocks to func1
+        func1->addBasicBlock(std::make_unique<BasicBlock>("BB1"));
+        func1->addBasicBlock(std::make_unique<BasicBlock>("BB2"));
+        func1->addBasicBlock(std::make_unique<BasicBlock>("BB3"));
 
-    func1->addBasicBlock(std::move(bb1));
-    func1->addBasicBlock(std::move(bb2));
-    func1->addBasicBlock(std::move(bb3));
-    myModule->addFunction(std::move(func1));
+        // Access the basic blocks
+        BasicBlock& bb1 = *func1->getBasicBlocks().at(0);
+        BasicBlock& bb2 = *func1->getBasicBlocks().at(1);
+        BasicBlock& bb3 = *func1->getBasicBlocks().at(2);
 
-    // Serialize to GraphViz
-    std::ofstream outputFile("control_flow_graph.dot");
-    if (outputFile.is_open()) {
-        serializeToGraphViz(outputFile, *myModule);
-        outputFile.close();
-        std::cout << "GraphViz file 'control_flow_graph.dot' generated successfully." << std::endl;
-    } else {
-        std::cerr << "Error: Unable to open file for writing." << std::endl;
+        bb1.addSuccessor(bb2, "true");
+        bb1.addSuccessor(bb3, "false");
+
+        myModule->addFunction(std::move(func1));
+
+        if (func1->isValid()) {
+            // Serialize to GraphViz
+            std::ofstream outputFile("control_flow_graph_example.dot");
+            if (outputFile.is_open()) {
+                serializeToGraphViz(outputFile, *myModule);
+                outputFile.close();
+                std::cout << "GraphViz file 'control_flow_graph_example.dot' generated successfully." << std::endl;
+            }
+            else {
+                std::cerr << "Error: Unable to open file for writing." << std::endl;
+            }
+        } else {
+            std::cerr << "Error: The function is not valid." << std::endl;
+        }
+
+        return 0;
     }
-
-    return 0;
-}
+// } // namespace ce::example 

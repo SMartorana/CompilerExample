@@ -1,5 +1,0 @@
-digraph MyModule {
-  "Function1_BB1" [label="BB1"];
-  "Function1_BB1" -> "Function1_BB2" [label="true"];
-  "Function1_BB1" -> "Function1_BB3" [label="false"];
-}
